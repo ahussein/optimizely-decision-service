@@ -7,6 +7,7 @@ import (
 
 	pb "github.com/ahussein/optimizely-decision-service/internal/activate"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 const (
@@ -25,13 +26,32 @@ func main() {
 
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+
+	experimentKey := "us-widget-bff"
+	m := map[string]interface{}{
+		"customer_uuid": "b5aedcf2-c5d8-4bd1-a4df-4d76702cea74",
+		"country":       "US",
+		"platform":      "mobile",
+		"public_id":     "jhds",
+	}
+
+	attributes, err := structpb.NewStruct(m)
+	if err != nil {
+		panic(err)
+	}
+
+	user := &pb.User{
+		Id:         "b5aedcf2-c5d8-4bd1-a4df-4d76702cea74",
+		Attributes: attributes,
+	}
 	defer cancel()
 	r, err := c.Activate(ctx, &pb.ActivateRequest{
-		ExperimentKey: "test",
+		ExperimentKey: experimentKey,
+		User:          user,
 	})
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		log.Fatalf("Could not get the activate variation", err)
 	}
-	log.Printf("Greeting: %s", r.Result)
+	log.Printf("Variation: %s", r.Variation)
 
 }
