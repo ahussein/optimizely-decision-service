@@ -4,20 +4,20 @@ WORKDIR /app
 
 COPY . .
 
-ARG GITHUB_TOKEN
-
 ENV CGO_ENABLED 0
 ENV GOOS linux
 
 RUN apk add make git
 
-RUN make all
+RUN make build-grpc
 
-# --- END OF RAML BUILDER
+RUN ls /app/build
 
 # APP IMAGE
 FROM ubuntu:bionic
 
-COPY --from=builder /app/build/optimizely-decision-service-api /optimizely-decision-service-api
-EXPOSE 80
-CMD ["optimizely-decision-service-api"]
+RUN apt-get update -y && apt-get install -y curl 
+WORKDIR /app
+COPY --from=builder /app/build/optimzely-decision-service-grpc /app/optimzely-decision-service-grpc
+EXPOSE 50051
+CMD ["/app/optimzely-decision-service-grpc"]
