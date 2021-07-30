@@ -29,12 +29,17 @@ all: clean build
 
 
 # Build the project
-build: build-api
+build: build-api build-grpc
 
 build-api:
 	@printf "$(OK_COLOR)==> Building API binary$(NO_COLOR)\n"
 	@if [ ! -d ${BUILD_DIR} ] ; then mkdir -p ${BUILD_DIR} ; fi
 	@GO111MODULE=on go build -o ${BUILD_DIR}/${BINARY_NAME}-api ${GO_LINKER_FLAGS} ${BUILD_SRC}/api
+
+build-grpc:
+	@printf "$(OK_COLOR)==> Building gRPC binary$(NO_COLOR)\n"
+	@if [ ! -d ${BUILD_DIR} ] ; then mkdir -p ${BUILD_DIR} ; fi
+	@GO111MODULE=on go build -o ${BUILD_DIR}/${BINARY_NAME}-grpc ${GO_LINKER_FLAGS} ${BUILD_SRC}/grpc
 
 # Test the project
 test-unit:

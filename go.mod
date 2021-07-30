@@ -5,6 +5,7 @@ go 1.14
 require (
 	contrib.go.opencensus.io/exporter/jaeger v0.2.1
 	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/golang/protobuf v1.4.3
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/optimizely/go-sdk v1.6.1
 	github.com/pkg/errors v0.8.1

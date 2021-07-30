@@ -7,8 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"hellofresh/customer-attributes-service/internal/platform/tracer"
-
+	"github.com/ahussein/optimizely-decision-service/internal/tracer"
 	"github.com/stretchr/testify/assert"
 )
 
