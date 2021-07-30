@@ -10,6 +10,9 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/stretchr/testify v1.6.1
 	go.opencensus.io v0.22.4
-	go.opentelemetry.io/otel v0.9.0
 	go.uber.org/zap v1.15.0
+	golang.org/x/sys v0.0.0-20200615200032-f1bc736245b1 // indirect
+	google.golang.org/grpc v1.39.0
+	google.golang.org/protobuf v1.25.0
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
