@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	address     = "10.100.84.194:80"
+	address     = "localhost:8080"
 	defaultName = "world"
 )
 
