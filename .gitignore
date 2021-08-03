@@ -19,3 +19,6 @@ build/
 
 # test coverage file
 coverage.txt
+
+# python cache files
+*/__pycache__/*

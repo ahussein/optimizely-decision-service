@@ -1,11 +1,22 @@
 # optimizely-decision-service
 A proxy microservice for the Optimizely Golang SDK
 
-
-protoc --go_out=. --go_opt=paths=source_relative \
---go-grpc_out=. --go-grpc_opt=paths=source_relative \
+## generate go client
+protoc --go_out=cmd/client/go/ --go_opt=paths=source_relative \
+--go-grpc_out=cmd/client/go/ --go-grpc_opt=paths=source_relative \
 --go-grpc_opt=require_unimplemented_servers=false \
 internal/activate/activate.proto
+
+
+## generate python client
+### install python tools
+```
+pip3 install grpcio grpcio-tools
+```
+### generate client code
+```
+python3 -m grpc_tools.protoc --proto_path=. ./internal/activate/activate.proto --python_out=cmd/client/python/ --grpc_python_out=cmd/client/python
+```
 	    
 ## Kubectl port forward command
 kns default
