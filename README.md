@@ -1,7 +1,12 @@
 # optimizely-decision-service
 A proxy microservice for the Optimizely Golang SDK
-
 ## generate go client
+```
+brew install protobuf
+
+go get -u github.com/golang/protobuf/protoc-gen-go
+```
+
 protoc --go_out=cmd/client/go/ --go_opt=paths=source_relative \
 --go-grpc_out=cmd/client/go/ --go-grpc_opt=paths=source_relative \
 --go-grpc_opt=require_unimplemented_servers=false \
