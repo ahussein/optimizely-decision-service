@@ -1,12 +1,16 @@
 # optimizely-decision-service
-A proxy microservice for the Optimizely Golang SDK
-
+`optimizely-decision-service` expose gRPC services to provide all the features in the Optimizely SDK to consumers. It wraps the Golang SDK.
 ## generate go client
-protoc --go_out=cmd/client/go/ --go_opt=paths=source_relative \
---go-grpc_out=cmd/client/go/ --go-grpc_opt=paths=source_relative \
---go-grpc_opt=require_unimplemented_servers=false \
-internal/activate/activate.proto
+```
+brew install protobuf
 
+go get -u github.com/golang/protobuf/protoc-gen-go
+```
+go to `<PROJECT_DIR>/cmd/grpc` and then execute
+
+```
+protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/experiment.proto
+```
 
 ## generate python client
 ### install python tools
