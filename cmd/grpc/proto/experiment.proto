@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto";
+option go_package = "github.com/ahussein/optimizely-decision-service/cmd/grpc/proto";
+
+package experiment;
+
+message ActivateRequest {
+    string experiment_key = 1;
+    string user_id = 2;
+    google.protobuf.Struct attributes = 3;
+}
+
+message Variation {
+    string variation = 1;
+}
+
+
+service Experiment {
+    rpc Activate(ActivateRequest) returns (Variation) {}
+}
