@@ -5,13 +5,13 @@ import (
 	"log"
 	"time"
 
-	pb "github.com/ahussein/optimizely-decision-service/internal/activate"
+	pb "github.com/ahussein/optimizely-decision-service/cmd/grpc/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
 const (
-	address     = "localhost:8080"
+	address     = "localhost:50051"
 	defaultName = "world"
 )
 
@@ -22,7 +22,7 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := pb.NewActivateClient(conn)
+	c := pb.NewExperimentClient(conn)
 
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -39,15 +39,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	user := &pb.User{
-		Id:         "b5aedcf2-c5d8-4bd1-a4df-4d76702cea74",
-		Attributes: attributes,
-	}
 	defer cancel()
 	r, err := c.Activate(ctx, &pb.ActivateRequest{
 		ExperimentKey: experimentKey,
-		User:          user,
+		UserId:        "b5aedcf2-c5d8-4bd1-a4df-4d76702cea74",
+		Attributes:    attributes,
 	})
 	if err != nil {
 		log.Fatalf("Could not get the activate variation", err)

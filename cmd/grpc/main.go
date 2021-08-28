@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
-	pb "github.com/ahussein/optimizely-decision-service/internal/activate"
+	pb "github.com/ahussein/optimizely-decision-service/cmd/grpc/proto"
 	"github.com/kelseyhightower/envconfig"
 	optly "github.com/optimizely/go-sdk"
 	"github.com/optimizely/go-sdk/pkg/client"
@@ -34,7 +34,7 @@ type OptimizelyConfig struct {
 type AppConfig struct {
 	Port            string        `default:":50051" envconfig:"GRPC_PORT" required:"true"`
 	Env             string        `default:"development" envconfig:"ENV" required:"true"`
-	DeploymentName  string        `envconfig:"DEPLOYMENT_NAME" required:"true"`
+	DeploymentName  string        `default:"optimizely-decision-service" envconfig:"DEPLOYMENT_NAME" required:"true"`
 	ShutdownTimeout time.Duration `default:"5s" envconfig:"SHUTDOWN_TIMEOUT"`
 	// HealthcheckTimeout time.Duration `default:"2s" envconfig:"HEALTHCHECK_TIMEOUT"`
 }
@@ -84,30 +84,30 @@ func initOPtimizelyClient(sdkKey string) (*client.OptimizelyClient, error) {
 	return optly.Client(sdkKey)
 }
 
-// server is used to implement helloworld.GreeterServer.
+// server is used to implement an interface for optimizely experiments/features
 type server struct {
-	pb.ActivateServer
+	pb.ExperimentServer
 	OptlyClient *client.OptimizelyClient
 	logger      *zap.Logger
 }
 
 // Activate returns the key of the variation the user is bucketed into and queues up an impression event to be sent to
 // the Optimizely log endpoint for results processing.
-func (s *server) Activate(ctx context.Context, in *pb.ActivateRequest) (*pb.ActivateResponse, error) {
+func (s *server) Activate(ctx context.Context, in *pb.ActivateRequest) (*pb.Variation, error) {
 	ek := in.ExperimentKey
 	var userAttributes map[string]interface{}
-	attr, err := in.User.Attributes.MarshalJSON()
+	attr, err := in.Attributes.MarshalJSON()
 	if err != nil {
-		s.logger.Error("reading user attributes", zap.String("experiment_key", ek), zap.Any("user", in.User.Attributes), zap.Error(err))
+		s.logger.Error("reading user attributes", zap.String("experiment_key", ek), zap.Any("attributes", in.Attributes), zap.Error(err))
 		return nil, err
 	}
 	err = json.Unmarshal(attr, &userAttributes)
 	if err != nil {
-		s.logger.Error("loading user attributes", zap.String("experiment_key", ek), zap.Any("user", in.User.Attributes), zap.Error(err))
+		s.logger.Error("loading user attributes", zap.String("experiment_key", ek), zap.Any("attributes", in.Attributes), zap.Error(err))
 		return nil, err
 	}
 	uc := entities.UserContext{
-		ID:         in.User.Id,
+		ID:         in.UserId,
 		Attributes: userAttributes,
 	}
 	variation, err := s.OptlyClient.Activate(ek, uc)
@@ -115,7 +115,7 @@ func (s *server) Activate(ctx context.Context, in *pb.ActivateRequest) (*pb.Acti
 		s.logger.Error("activating user", zap.String("experiment_key", ek), zap.Any("user", uc), zap.Error(err))
 		return nil, err
 	}
-	return &pb.ActivateResponse{
+	return &pb.Variation{
 		Variation: variation,
 	}, nil
 }
@@ -151,7 +151,7 @@ func main() {
 		logger.Fatal("failed to listen", zap.Error(err))
 	}
 	s := grpc.NewServer()
-	pb.RegisterActivateServer(s, &server{
+	pb.RegisterExperimentServer(s, &server{
 		OptlyClient: optlyClient,
 		logger:      logger,
 	})
